@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html ng-app="TaskNow">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+   
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css"/>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/js/bootstrap.min.js">
+    </script>
+     <script src="js/angular.js">
+    </script>
+     <script>
+     angular.module("TaskNow",[]);
+    angular.module("TaskNow").controller("TaskNowctrl",function($scope,$timeout){
+        $scope.tarefas=[
+        {nome:"ir ao mercado", prioridade: 1, data: new Date() },
+        {nome:"fazer exercicio", prioridade: 4,data: new Date() },
+        {nome:"comprar ração", prioridade: 3,data: new Date()},
+
+        ];     
+
+    $scope.adicionarTarefa = function(tarefa) {
+ //tarefa.data=new Date() ;
+$scope.tarefas.push(angular.copy(tarefa));
+$scope.tarefas.sort();
+delete $scope.tarefa;
+
+        };
+
+    $scope.ordenarPor = function(campo) {
+            $scope.criterio = campo; 
+        };
+        
+    $scope.concluirTarefa = function(tarefas) {
+
+            var promiseConcluirTarefa = $timeout(function(){
+
+            $scope.tarefas = tarefas.filter(function(tarefa){
+       
+                if ( ! tarefa.selecionada) return tarefa;
+                 })
+
+
+            $scope.mensagens=[{texto:"Tarefa Concluída"},]; 
+
+            var promiseExcluirMensagem = $timeout(function(){
+                
+                $scope.mensagens=[{texto:""},];
+
+            },1000);
+
+            },2000);
+            };
+    
+    $scope.isTarefaSelecionada = function(tarefas){
+        return tarefas.some(function(tarefa){
+            return tarefa.selecionada;
+        });
+    };
+});
+
+    </script>     
+
+	<title>teste angular</title>
+    <style>
+    .jumbotron{
+        text-align: left;
+        font-family: Segoe UI;
+
+    }
+
+    #header1 {      
+        color: #ffffff ;
+        font-style: bold;
+        background-color: #0099ff ;
+        background-image: url(http://lorempixel.com/1200/400) ;
+        vertical-align: center;
+        opacity: 0.7;      
+
+    }
+    .td{
+margin-right: 30px;
+    }
+
+    </style>
+</head>
+<body ng-controller="TaskNowctrl">
+<div id="header1"class="jumbotron" >
+<h3>TaskNow</h3>
+</div>
+<div name="lista tarefas" class="jumbotron" vertical-align="center">
+<table class="table">
+<tr>
+    <th></th>
+<th>Nome</th>
+<th><a href="" ng-click="ordenarPor('data')">Vencimento</a></th>
+<th><a href="" ng-click="ordenarPor('prioridade')">Prioridade</a></th>
+
+</tr>
+<tr  ng-click="concluirTarefa(tarefas)"ng-class="{success: tarefa.selecionada}"  ng-if"isTarefaSelecionada(tarefas)" ng-repeat="tarefa in tarefas | orderBy: criterio" >
+    <td><input type="checkbox" ng-model="tarefa.selecionada"/></td>
+    <td>{{tarefa.nome}}</td>
+    <td>{{tarefa.data |date: 'dd/MM/yyyy' }}</td>
+    <td>{{tarefa.prioridade}}</td>
+</tr>
+</table>
+</div>
+<div>
+    <div class="jumbotron" ng-show="mensagem.texto" ng-repeat="mensagem in mensagens">
+        {{mensagem.texto}}
+    </div>
+<input class="form-control" type="text" ng-model="tarefa.nome" placeholder="nome da tarefa" />
+<input class="form-control" type="number" ng-model="tarefa.prioridade" placeholder="prioridade"/>
+<input class="form-control" type="date" ng-model="tarefa.data" placeholder="data de vencimento"/>
+<button class="btn btn-primary btn-block" ng-disabled="!tarefa.nome" ng-click="adicionarTarefa(tarefa)">Adicionar {{tarefa.nome}}</button>
+
+
+</div>
+</body>
+</html>
